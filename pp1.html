@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhagavathi Amman Electricals — Smart Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{
+  --cream:#F8F5F0;
+  --warm:#F2ECE4;
+  --card:#FFFFFF;
+  --card2:#FAFAF8;
+  --border:#E8E2D9;
+  --border2:#D4CCC0;
+  --ink:#1A1612;
+  --ink2:#3D3530;
+  --ink3:#6B6360;
+  --ink4:#9A9390;
+  --amber:#E07B20;
+  --amber2:#F59332;
+  --amber-light:#FEF3E7;
+  --amber-glow:rgba(224,123,32,0.15);
+  --green:#16A34A;
+  --green-l:#DCFCE7;
+  --red:#DC2626;
+  --red-l:#FEE2E2;
+  --blue:#2563EB;
+  --blue-l:#DBEAFE;
+  --yellow:#CA8A04;
+  --yellow-l:#FEF9C3;
+  --purple:#7C3AED;
+  --purple-l:#EDE9FE;
+  --teal:#0D9488;
+  --teal-l:#CCFBF1;
+  --r:14px;
+  --r2:10px;
+  --sh:0 1px 3px rgba(0,0,0,0.05),0 4px 16px rgba(0,0,0,0.06);
+  --sh2:0 2px 8px rgba(0,0,0,0.08),0 8px 32px rgba(0,0,0,0.08);
+  --sh3:0 4px 20px rgba(224,123,32,0.2),0 0 0 1px rgba(224,123,32,0.1);
+}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+input,select,button,textarea{font-family:'Outfit',sans-serif}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--warm)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+select option{background:#fff}
+a{text-decoration:none;color:inherit}
+
+.shell{display:flex;min-height:100vh}
+
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--ink);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;overflow-x:hidden;
+  transition:width .3s ease;
+  z-index:100;
+}
+.sidebar.collapsed{width:64px}
+.sb-top{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sb-brand{display:flex;align-items:center;gap:12px;overflow:hidden}
+.sb-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 4px 12px rgba(224,123,32,0.4);
+}
+.sb-brand-text{overflow:hidden;white-space:nowrap}
+.sb-name{font-weight:800;font-size:13px;color:#fff;letter-spacing:.3px;line-height:1.2}
+.sb-loc{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:.5px;margin-top:2px}
+.sb-toggle{
+  width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.08);
+  border:none;cursor:pointer;color:rgba(255,255,255,0.5);font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+  margin-left:auto;flex-shrink:0;
+}
+.sb-toggle:hover{background:rgba(255,255,255,0.14);color:#fff}
+.sb-nav{padding:12px 8px;flex:1}
+.sb-section{margin-bottom:20px}
+.sb-sec-label{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);padding:4px 8px 8px;
+  white-space:nowrap;overflow:hidden;
+}
+.sb-item{
+  display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:8px;
+  cursor:pointer;transition:all .2s;color:rgba(255,255,255,0.55);
+  font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;border:none;background:none;
+  width:100%;text-align:left;position:relative;
+}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85)}
+.sb-item.active{background:rgba(224,123,32,0.18);color:var(--amber2)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--amber2);border-radius:0 3px 3px 0}
+.sb-item-icon{width:20px;text-align:center;font-size:16px;flex-shrink:0}
+.sb-item-label{overflow:hidden;white-space:nowrap}
+.sb-badge{
+  margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;
+  padding:2px 6px;border-radius:10px;flex-shrink:0;
+}
+.sb-bottom{padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.sb-profile{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;overflow:hidden}
+.sb-profile:hover{background:rgba(255,255,255,0.07)}
+.sb-avatar{
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--amber),var(--amber2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;
+}
+.sb-profile-info{overflow:hidden;white-space:nowrap}
+.sb-profile-name{font-size:12px;font-weight:700;color:#fff}
+.sb-profile-role{font-size:10px;color:rgba(255,255,255,0.35)}
+
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
+
+.topbar{
+  background:rgba(248,245,240,0.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:12px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;flex-wrap:wrap;gap:10px;
+}
+.tb-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tb-title{font-size:18px;font-weight:800;color:var(--ink)}
+.tb-breadcrumb{font-size:12px;color:var(--ink4);display:flex;align-items:center;gap:5px}
+.tb-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.period-select{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink2);outline:none;cursor:pointer;
+  transition:border-color .2s;
+}
+.period-select:focus{border-color:var(--amber)}
+.tb-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  background:var(--card);color:var(--ink2);
+}
+.tb-btn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-light)}
+.tb-btn-primary{background:var(--amber);border-color:var(--amber);color:#fff}
+.tb-btn-primary:hover{background:#C96E15;border-color:#C96E15;color:#fff}
+.clock-chip{
+  background:var(--ink);color:var(--amber2);border-radius:8px;
+  padding:7px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  letter-spacing:.5px;white-space:nowrap;
+}
+.notif-btn{
+  width:36px;height:36px;border-radius:8px;background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;
+  position:relative;transition:all .2s;
+}
+.notif-btn:hover{border-color:var(--amber);background:var(--amber-light)}
+.notif-dot{
+  position:absolute;top:6px;right:6px;width:8px;height:8px;
+  background:var(--red);border-radius:50%;border:2px solid var(--cream);
+}
+
+.content{padding:24px 28px;display:flex;flex-direction:column;gap:28px;flex:1}
+.page{display:none;flex-direction:column;gap:28px}
+.page.active{display:flex}
+
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.sec-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';display:inline-block;width:3px;height:16px;background:var(--amber);border-radius:2px}
+.sec-link{font-size:12px;color:var(--amber);font-weight:600;cursor:pointer}
+.sec-link:hover{text-decoration:underline}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.kpi{
+  background:var(--card);border-radius:var(--r);border:1px solid var(--border);
+  padding:20px 22px;box-shadow:var(--sh);position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .2s;cursor:default;
+}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2)}
+/* 3D top stripe */
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:var(--r) var(--r) 0 0;
+}
+.kpi.amber::before{background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.kpi.green::before{background:linear-gradient(90deg,#16A34A,#22C55E)}
+.kpi.red::before{background:linear-gradient(90deg,#DC2626,#F87171)}
+.kpi.blue::before{background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.kpi.purple::before{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.kpi.teal::before{background:linear-gradient(90deg,#0D9488,#2DD4BF)}
+.kpi.yellow::before{background:linear-gradient(90deg,#CA8A04,#FACC15)}
+.kpi.ink::before{background:linear-gradient(90deg,var(--ink),var(--ink2))}
+/* Decorative circle */
+.kpi::after{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;opacity:.06;
+}
+.kpi.amber::after{background:var(--amber)}
+.kpi.green::after{background:var(--green)}
+.kpi.red::after{background:var(--red)}
+.kpi.blue::after{background:var(--blue)}
+.kpi.purple::after{background:var(--purple)}
+.kpi.teal::after{background:var(--teal)}
+.kpi.yellow::after{background:var(--yellow)}
+.kpi.ink::after{background:var(--ink)}
+.kpi-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.kpi-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.kpi.amber .kpi-icon{background:var(--amber-light);color:var(--amber)}
+.kpi.green .kpi-icon{background:var(--green-l);color:var(--green)}
+.kpi.red .kpi-icon{background:var(--red-l);color:var(--red)}
+.kpi.blue .kpi-icon{background:var(--blue-l);color:var(--blue)}
+.kpi.purple .kpi-icon{background:var(--purple-l);color:var(--purple)}
+.kpi.teal .kpi-icon{background:var(--teal-l);color:var(--teal)}
+.kpi.yellow .kpi-icon{background:var(--yellow-l);color:var(--yellow)}
+.kpi.ink .kpi-icon{background:rgba(26,22,18,0.08);color:var(--ink)}
+.kpi-lbl{font-size:11px;font-weight:600;color:var(--ink4);letter-spacing:.5px;text-transform:uppercase;line-height:1.4;flex:1;padding-right:8px}
+.kpi-val{font-size:28px;font-weight:800;color:var(--ink);line-height:1;margin-bottom:8px;letter-spacing:-1px}
+.kpi-sub{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.kpi-note{font-size:11px;color:var(--ink4)}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+.pill.up{background:var(--green-l);color:var(--green)}
+.pill.dn{background:var(--red-l);color:var(--red)}
+.pill.warn{background:var(--yellow-l);color:var(--yellow)}
+.pill.info{background:var(--blue-l);color:var(--blue)}
+.pill.amber{background:var(--amber-light);color:var(--amber)}
+.kpi-prog{margin-top:12px}
+.kpi-prog-track{height:5px;background:var(--border);border-radius:100px;overflow:hidden}
+.kpi-prog-fill{height:100%;border-radius:100px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.kpi.amber .kpi-prog-fill{background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.kpi.green .kpi-prog-fill{background:linear-gradient(90deg,#16A34A,#22C55E)}
+.kpi.red .kpi-prog-fill{background:linear-gradient(90deg,#DC2626,#F87171)}
+
+.grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c8{grid-column:span 8}
+.c7{grid-column:span 7}
+.c5{grid-column:span 5}
+.c6{grid-column:span 6}
+.c4{grid-column:span 4}
+.c3{grid-column:span 3}
+@media(max-width:1024px){.c8,.c7,.c5,.c6,.c4,.c3{grid-column:span 12}}
+.chart-card{
+  background:var(--card);border-radius:var(--r);border:1px solid var(--border);
+  padding:22px;box-shadow:var(--sh);transition:box-shadow .2s;
+}
+.chart-card:hover{box-shadow:var(--sh2)}
+.cc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.cc-title{font-size:15px;font-weight:700;color:var(--ink)}
+.cc-sub{font-size:11px;color:var(--ink4);margin-top:3px;font-style:italic}
+.cc-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--ink3)}
+.ldot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle}
+.chart-wrap{position:relative}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.stat-box{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:18px 20px;box-shadow:var(--sh);transition:all .2s;
+}
+.stat-box:hover{transform:translateY(-2px);border-color:var(--amber);box-shadow:var(--sh3)}
+.stat-icon{font-size:24px;margin-bottom:8px}
+.stat-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);margin-bottom:5px}
+.stat-val{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-0.5px}
+.stat-trend{font-size:11.5px;color:var(--ink4);margin-top:5px}
+.t-up{color:var(--green);font-weight:700}
+.t-dn{color:var(--red);font-weight:700}
+
+.table-card{
+  background:var(--card);border-radius:var(--r);border:1px solid var(--border);
+  box-shadow:var(--sh);overflow:hidden;
+}
+.tc-head{
+  padding:18px 22px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;
+  background:var(--card2);
+}
+.tc-title{font-size:15px;font-weight:700;color:var(--ink)}
+.tc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tc-search{
+  background:var(--cream);border:1px solid var(--border);border-radius:8px;
+  padding:7px 12px;font-size:12px;color:var(--ink);outline:none;
+  width:200px;transition:border-color .2s;
+}
+.tc-search:focus{border-color:var(--amber);background:#fff}
+.tc-btn{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .2s;border:1px solid;font-family:'Outfit',sans-serif;
+}
+.tc-btn-primary{background:var(--amber);border-color:var(--amber);color:#fff}
+.tc-btn-primary:hover{background:#C96E15}
+.tc-btn-sec{background:var(--card);border-color:var(--border);color:var(--ink2)}
+.tc-btn-sec:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-light)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+thead th{
+  background:var(--warm);color:var(--ink4);font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);
+  font-weight:700;white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s;
+}
+thead th:hover{color:var(--amber)}
+thead th.sort-asc::after{content:' ↑';color:var(--amber)}
+thead th.sort-desc::after{content:' ↓';color:var(--amber)}
+tbody tr{border-bottom:1px solid rgba(232,226,217,0.6);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--amber-light)}
+tbody td{padding:11px 16px;color:var(--ink);vertical-align:middle}
+.td-id{font-size:10.5px;color:var(--ink4);font-family:'JetBrains Mono',monospace;font-weight:600}
+.td-name{font-weight:600}
+/* Stock badges */
+.s-ok{background:var(--green-l);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+.s-low{background:var(--yellow-l);color:var(--yellow);border:1px solid rgba(202,138,4,.2)}
+.s-crit{background:var(--red-l);color:var(--red);border:1px solid rgba(220,38,38,.2)}
+.s-out{background:rgba(220,38,38,.07);color:var(--red);border:1px solid rgba(220,38,38,.15)}
+.stock-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700}
+/* Category tags */
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.tag-wire{background:#EFF6FF;color:#2563EB}
+.tag-light{background:var(--yellow-l);color:var(--yellow)}
+.tag-switch{background:var(--purple-l);color:var(--purple)}
+.tag-protect{background:var(--red-l);color:var(--red)}
+.tag-smart{background:var(--teal-l);color:var(--teal)}
+.tag-fan{background:var(--green-l);color:var(--green)}
+.tag-panel{background:var(--amber-light);color:var(--amber)}
+.tag-tool{background:rgba(26,22,18,.07);color:var(--ink2)}
+/* Qty colors */
+.qty-ok{color:var(--green);font-weight:700}
+.qty-low{color:var(--yellow);font-weight:700}
+.qty-crit{color:var(--red);font-weight:700}
+/* Mini bar */
+.sbar{width:50px;height:4px;background:var(--border);border-radius:100px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px}
+.sbar-fill{height:100%;border-radius:100px}
+.sb-ok{background:var(--green)}
+.sb-low{background:var(--yellow)}
+.sb-crit{background:var(--red)}
+/* Pagination */
+.pg-row{padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;background:var(--card2)}
+.pg-info{font-size:11.5px;color:var(--ink4)}
+.pg-btns{display:flex;gap:4px}
+.pg-btn{
+  padding:5px 11px;border-radius:6px;font-size:12px;font-weight:600;
+  background:var(--card);border:1px solid var(--border);color:var(--ink3);
+  cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;
+}
+.pg-btn:hover,.pg-btn.active{background:var(--amber);color:#fff;border-color:var(--amber)}
+.pg-btn:disabled{opacity:.4;cursor:default;pointer-events:none}
+
+.alerts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.alert-card{
+  border-radius:var(--r2);padding:18px;border:1px solid;
+  transition:all .2s;cursor:default;background:var(--card);
+}
+.alert-card:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.ac-red{border-color:rgba(220,38,38,.25);background:linear-gradient(135deg,#fff,#FFF5F5)}
+.ac-yellow{border-color:rgba(202,138,4,.25);background:linear-gradient(135deg,#fff,#FFFBEB)}
+.ac-green{border-color:rgba(22,163,74,.25);background:linear-gradient(135deg,#fff,#F0FDF4)}
+.ac-blue{border-color:rgba(37,99,235,.25);background:linear-gradient(135deg,#fff,#EFF6FF)}
+.ac-amber{border-color:rgba(224,123,32,.25);background:linear-gradient(135deg,#fff,var(--amber-light))}
+.ac-icon{font-size:28px;margin-bottom:10px}
+.ac-type{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.ac-red .ac-type{color:var(--red)}
+.ac-yellow .ac-type{color:var(--yellow)}
+.ac-green .ac-type{color:var(--green)}
+.ac-blue .ac-type{color:var(--blue)}
+.ac-amber .ac-type{color:var(--amber)}
+.ac-title{font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px}
+.ac-desc{font-size:12px;color:var(--ink3);line-height:1.65}
+.ac-action{
+  margin-top:12px;font-size:11px;font-weight:700;padding:5px 12px;
+  border-radius:6px;display:inline-block;cursor:pointer;transition:all .2s;
+}
+.ac-red .ac-action{background:var(--red-l);color:var(--red)}
+.ac-yellow .ac-action{background:var(--yellow-l);color:var(--yellow)}
+.ac-green .ac-action{background:var(--green-l);color:var(--green)}
+.ac-blue .ac-action{background:var(--blue-l);color:var(--blue)}
+.ac-amber .ac-action{background:var(--amber-light);color:var(--amber)}
+
+.top-prod-list{display:flex;flex-direction:column;gap:10px}
+.tp-item{
+  background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all .2s;
+}
+.tp-item:hover{border-color:var(--amber);background:var(--amber-light)}
+.tp-rank{
+  width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;flex-shrink:0;color:#fff;
+}
+.tp-r1{background:linear-gradient(135deg,#F59E0B,#D97706)}
+.tp-r2{background:linear-gradient(135deg,#94A3B8,#64748B)}
+.tp-r3{background:linear-gradient(135deg,#D97706,#B45309)}
+.tp-r4{background:linear-gradient(135deg,#6B7280,#4B5563)}
+.tp-r5{background:linear-gradient(135deg,#92400E,#78350F)}
+.tp-info{flex:1;min-width:0}
+.tp-name{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tp-brand{font-size:11px;color:var(--ink4)}
+.tp-bar-wrap{width:100px;flex-shrink:0}
+.tp-bar-track{height:6px;background:var(--border);border-radius:100px;overflow:hidden;margin-bottom:4px}
+.tp-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.tp-rev{font-size:13px;font-weight:800;color:var(--ink);flex-shrink:0;text-align:right;min-width:80px}
+.tp-qty{font-size:10px;color:var(--ink4)}
+
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(26,22,18,.5);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:#fff;border-radius:18px;padding:30px;width:100%;max-width:540px;
+  max-height:90vh;overflow-y:auto;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,0.15);
+  animation:modalIn .25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.modal-close{
+  position:absolute;top:18px;right:18px;width:32px;height:32px;
+  background:var(--warm);border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;font-size:16px;color:var(--ink3);display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.modal-close:hover{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-group label{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase}
+.form-input,.form-select{
+  background:var(--cream);border:1.5px solid var(--border);border-radius:8px;
+  padding:10px 13px;color:var(--ink);font-size:13px;font-family:'Outfit',sans-serif;
+  outline:none;transition:border-color .2s;width:100%;
+}
+.form-input:focus,.form-select:focus{border-color:var(--amber);background:#fff;box-shadow:0 0 0 3px var(--amber-glow)}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.btn-cancel{background:var(--cream);color:var(--ink2);border:1.5px solid var(--border);padding:10px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.btn-cancel:hover{border-color:var(--red);color:var(--red)}
+.btn-save{background:var(--amber);color:#fff;border:none;padding:10px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;transition:background .2s}
+.btn-save:hover{background:#C96E15}
+
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:2000;
+  background:#fff;border:1.5px solid var(--green);border-radius:12px;
+  padding:14px 18px;font-size:13px;font-weight:600;color:var(--green);
+  display:flex;align-items:center;gap:10px;
+  transform:translateY(80px);opacity:0;box-shadow:var(--sh2);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:18px}
+
+.hero-band{
+  background:linear-gradient(135deg,var(--ink) 0%,#2D2620 100%);
+  border-radius:var(--r);padding:28px 32px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
+  box-shadow:0 4px 24px rgba(26,22,18,0.18);position:relative;overflow:hidden;
+}
+.hero-band::before{
+  content:'⚡';position:absolute;right:28px;top:50%;transform:translateY(-50%);
+  font-size:120px;opacity:.04;line-height:1;pointer-events:none;
+}
+.hero-left{}
+.hero-greeting{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.hero-main{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.2;margin-bottom:4px}
+.hero-main em{color:var(--amber2);font-style:italic}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.45)}
+.hero-right{display:flex;gap:24px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hs-val{font-size:24px;font-weight:800;color:var(--amber2);letter-spacing:-1px}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.hero-divider{width:1px;background:rgba(255,255,255,0.08);align-self:stretch}
+
+.pay-badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:10.5px;font-weight:700}
+.pay-cash{background:var(--green-l);color:var(--green)}
+.pay-upi{background:var(--purple-l);color:var(--purple)}
+.pay-card{background:var(--blue-l);color:var(--blue)}
+
+.sparkline-row{display:flex;gap:2px;align-items:flex-end;height:28px}
+.spark-bar{background:var(--amber);border-radius:2px 2px 0 0;flex:1;min-width:4px;opacity:.7;transition:opacity .2s}
+.spark-bar:hover{opacity:1}
+
+.ana-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.ana-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:18px;box-shadow:var(--sh);transition:all .2s;
+}
+.ana-card:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--amber)}
+.ana-rank{font-size:36px;font-weight:900;color:var(--border2);font-family:'DM Serif Display',serif;line-height:1;margin-bottom:6px}
+.ana-name{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.ana-brand{font-size:11px;color:var(--ink4);margin-bottom:12px}
+.ana-progress{height:5px;background:var(--border);border-radius:100px;overflow:hidden;margin-bottom:10px}
+.ana-prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.ana-stats{display:flex;gap:14px;flex-wrap:wrap}
+.ana-stat{font-size:11px;color:var(--ink4)}
+.ana-stat span{color:var(--ink);font-weight:700}
+
+@media(max-width:768px){
+  .sidebar{width:64px;position:fixed;height:100vh}
+  .sidebar .sb-item-label,.sidebar .sb-brand-text,.sidebar .sb-sec-label,
+  .sidebar .sb-profile-info,.sidebar .sb-badge{display:none}
+  .main-area{margin-left:64px}
+  .content{padding:16px}
+  .topbar{padding:10px 16px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-band{padding:20px}
+}
+@media(max-width:480px){.kpi-grid{grid-template-columns:1fr};.form-row{grid-template-columns:1fr}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.kpi{animation:fadeUp .4s ease both}
+.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}
+.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}
+.kpi:nth-child(5){animation-delay:.25s}.kpi:nth-child(6){animation-delay:.3s}
+.kpi:nth-child(7){animation-delay:.35s}.kpi:nth-child(8){animation-delay:.4s}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-icon">⚡</div>
+      <div class="sb-brand-text">
+        <div class="sb-name">Bhagavathi Amman</div>
+        <div class="sb-loc">Sathyamangalam, TN</div>
+      </div>
+      <button class="sb-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">☰</button>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">
+      <div class="sb-sec-label">Main Menu</div>
+      <button class="sb-item active" onclick="switchPage('dashboard',this)">
+        <span class="sb-item-icon">📊</span>
+        <span class="sb-item-label">Dashboard</span>
+      </button>
+      <button class="sb-item" onclick="switchPage('sales',this)">
+        <span class="sb-item-icon">📈</span>
+        <span class="sb-item-label">Sales Analysis</span>
+      </button>
+      <button class="sb-item" onclick="switchPage('stock',this)">
+        <span class="sb-item-icon">📦</span>
+        <span class="sb-item-label">Stock Manager</span>
+        <span class="sb-badge">8</span>
+      </button>
+      <button class="sb-item" onclick="switchPage('alerts',this)">
+        <span class="sb-item-icon">🔔</span>
+        <span class="sb-item-label">Alerts</span>
+        <span class="sb-badge" style="background:var(--red)">7</span>
+      </button>
+    </div>
+    <div class="sb-section">
+      <div class="sb-sec-label">Reports</div>
+      <button class="sb-item" onclick="showToast('Reports module — coming soon!','var(--blue)')">
+        <span class="sb-item-icon">📑</span>
+        <span class="sb-item-label">Monthly Report</span>
+      </button>
+      <button class="sb-item" onclick="showToast('Supplier module — coming soon!','var(--teal)')">
+        <span class="sb-item-icon">🏭</span>
+        <span class="sb-item-label">Suppliers</span>
+      </button>
+      <button class="sb-item" onclick="showToast('Customer module — coming soon!','var(--purple)')">
+        <span class="sb-item-icon">👥</span>
+        <span class="sb-item-label">Customers</span>
+      </button>
+      <button class="sb-item" onclick="showToast('Settings — coming soon!','var(--ink3)')">
+        <span class="sb-item-icon">⚙️</span>
+        <span class="sb-item-label">Settings</span>
+      </button>
+    </div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-profile">
+      <div class="sb-avatar">BA</div>
+      <div class="sb-profile-info">
+        <div class="sb-profile-name">Shop Owner</div>
+        <div class="sb-profile-role">Admin Access</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-area">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-title" id="pageTitle">Dashboard Overview</div>
+      <div class="tb-breadcrumb">
+        <span>Bhagavathi Amman</span>
+        <span>›</span>
+        <span id="pageCrumb" style="color:var(--amber)">Overview</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <select class="period-select" id="periodSel" onchange="updatePeriod()">
+        <option>April 2026</option>
+        <option>March 2026</option>
+        <option>Last 7 Days</option>
+        <option>Q1 2026</option>
+        <option>Full Year 2026</option>
+      </select>
+      <button class="tb-btn" onclick="showToast('Exporting data...','var(--blue)')">⬇ Export</button>
+      <button class="tb-btn tb-btn-primary" onclick="openModal()">+ Add Product</button>
+      <div class="notif-btn" onclick="switchPage('alerts',document.querySelector('[onclick*=alerts]'))" title="Alerts">
+        🔔<span class="notif-dot"></span>
+      </div>
+      <div class="clock-chip" id="clockEl">00:00:00 IST</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+<div class="page active" id="page-dashboard">
+  <div class="hero-band">
+    <div class="hero-left">
+      <div class="hero-greeting">Good Day, Owner</div>
+      <div class="hero-main">April 2026 — <em>Best Month Yet</em></div>
+      <div class="hero-sub">Revenue at 94.8% of target · 1 day remaining · 8 items need attention</div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat"><div class="hs-val">₹2.84L</div><div class="hs-lbl">Revenue</div></div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat"><div class="hs-val">1,248</div><div class="hs-lbl">Orders</div></div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat"><div class="hs-val">22.2%</div><div class="hs-lbl">Margin</div></div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat"><div class="hs-val">6,820</div><div class="hs-lbl">Units</div></div>
+    </div>
+  </div>
+  <div>
+    <div class="sec-head"><div class="sec-title">Key Performance Indicators</div><div class="sec-link">View All →</div></div>
+    <div class="kpi-grid">
+      <div class="kpi amber">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Revenue This Month</div>
+          <div class="kpi-icon">💰</div>
+        </div>
+        <div class="kpi-val">₹2,84,500</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">Target ₹3,00,000</span>
+          <span class="pill up">↑ 18.4%</span>
+        </div>
+        <div class="kpi-prog"><div class="kpi-prog-track"><div class="kpi-prog-fill" style="width:94.8%"></div></div></div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Total Orders</div>
+          <div class="kpi-icon">📦</div>
+        </div>
+        <div class="kpi-val">1,248</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">Avg 42/day</span>
+          <span class="pill up">↑ 192</span>
+        </div>
+        <div class="kpi-prog"><div class="kpi-prog-track"><div class="kpi-prog-fill" style="width:78%" style="background:linear-gradient(90deg,#16A34A,#22C55E)"></div></div></div>
+      </div>
+      <div class="kpi blue">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Units Sold</div>
+          <div class="kpi-icon">📊</div>
+        </div>
+        <div class="kpi-val">6,820</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">Avg 227/day</span>
+          <span class="pill up">↑ 14.8%</span>
+        </div>
+      </div>
+      <div class="kpi purple">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Gross Profit</div>
+          <div class="kpi-icon">💎</div>
+        </div>
+        <div class="kpi-val">₹63,200</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">Margin 22.2%</span>
+          <span class="pill warn">↓ 0.6%</span>
+        </div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Low / Out of Stock</div>
+          <div class="kpi-icon">⚠️</div>
+        </div>
+        <div class="kpi-val">8</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">Critical: 3 items</span>
+          <span class="pill dn">Action Now</span>
+        </div>
+      </div>
+      <div class="kpi teal">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Avg Order Value</div>
+          <div class="kpi-icon">🏷️</div>
+        </div>
+        <div class="kpi-val">₹228</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">vs ₹201 last month</span>
+          <span class="pill up">↑ 13.4%</span>
+        </div>
+      </div>
+      <div class="kpi yellow">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Stock Value</div>
+          <div class="kpi-icon">🏪</div>
+        </div>
+        <div class="kpi-val">₹8.42L</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">4,800 products</span>
+          <span class="pill info">Healthy</span>
+        </div>
+      </div>
+      <div class="kpi ink">
+        <div class="kpi-header">
+          <div class="kpi-lbl">Top Brand</div>
+          <div class="kpi-icon">⭐</div>
+        </div>
+        <div class="kpi-val" style="font-size:22px">Polycab</div>
+        <div class="kpi-sub">
+          <span class="kpi-note">₹86,400 · 1,840 units</span>
+          <span class="pill amber">30.4%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid12">
+    <div class="chart-card c8">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Monthly Revenue — 2025 vs 2026</div>
+          <div class="cc-sub">Is this year tracking above last year?</div>
+        </div>
+        <div class="cc-legend">
+          <span><span class="ldot" style="background:var(--amber)"></span>2026</span>
+          <span><span class="ldot" style="background:var(--blue)"></span>2025</span>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="revChart"></canvas></div>
+    </div>
+    <div class="chart-card c4">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Revenue by Category</div>
+          <div class="cc-sub">Which category drives most?</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:170px"><canvas id="catChart"></canvas></div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--ink3)">
+        <span><span class="ldot" style="background:#2563EB"></span>Wiring 30%</span>
+        <span><span class="ldot" style="background:var(--yellow)"></span>Lighting 22%</span>
+        <span><span class="ldot" style="background:var(--purple)"></span>Switches 18%</span>
+        <span><span class="ldot" style="background:var(--red)"></span>Protection 15%</span>
+        <span><span class="ldot" style="background:var(--green)"></span>Others 15%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid12">
+    <div class="chart-card c4">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Units by Category</div>
+          <div class="cc-sub">Which products sell most?</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="unitChart"></canvas></div>
+    </div>
+    <div class="chart-card c8">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Daily Revenue — April 2026</div>
+          <div class="cc-sub">Peak and off-peak sales days</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="dailyChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid12">
+    <div class="chart-card c6">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Revenue by Brand</div>
+          <div class="cc-sub">Brand contribution this month</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="brandChart"></canvas></div>
+    </div>
+    <div class="chart-card c6">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Profit Margin Trend</div>
+          <div class="cc-sub">Is margin improving?</div>
+        </div>
+        <div class="cc-legend">
+          <span><span class="ldot" style="background:var(--green)"></span>Actual</span>
+          <span><span class="ldot" style="background:var(--red);opacity:.5"></span>Target 25%</span>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="marginChart"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page" id="page-sales">
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Sales Summary — April 2026</div></div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-icon">💰</div>
+        <div class="stat-lbl">Total Revenue</div>
+        <div class="stat-val">₹2,84,500</div>
+        <div class="stat-trend"><span class="t-up">↑ 18.4%</span> vs last month</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🧾</div>
+        <div class="stat-lbl">Transactions</div>
+        <div class="stat-val">1,248</div>
+        <div class="stat-trend"><span class="t-up">↑ 192</span> more orders</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">📦</div>
+        <div class="stat-lbl">Units Sold</div>
+        <div class="stat-val">6,820</div>
+        <div class="stat-trend"><span class="t-up">↑ 880</span> more units</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏷️</div>
+        <div class="stat-lbl">Avg Selling Price</div>
+        <div class="stat-val">₹41.7</div>
+        <div class="stat-trend"><span class="t-up">↑ ₹3.2</span> vs last month</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">💎</div>
+        <div class="stat-lbl">Net Profit</div>
+        <div class="stat-val">₹63,200</div>
+        <div class="stat-trend">Margin: <span class="t-dn">22.2%</span> (target 25%)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid12">
+    <div class="c6">
+      <div class="sec-head"><div class="sec-title">Top 5 Products by Revenue</div></div>
+      <div class="top-prod-list">
+        <div class="tp-item">
+          <div class="tp-rank tp-r1">#1</div>
+          <div class="tp-info"><div class="tp-name">Polycab FR Wire 2.5mm</div><div class="tp-brand">Polycab · Wiring</div></div>
+          <div class="tp-bar-wrap"><div class="tp-bar-track"><div class="tp-bar-fill" style="width:100%"></div></div><div class="tp-qty">240 units</div></div>
+          <div class="tp-rev">₹44,200</div>
+        </div>
+        <div class="tp-item">
+          <div class="tp-rank tp-r2">#2</div>
+          <div class="tp-info"><div class="tp-name">LED Panel Light 18W</div><div class="tp-brand">Philips · Lighting</div></div>
+          <div class="tp-bar-wrap"><div class="tp-bar-track"><div class="tp-bar-fill" style="width:82%"></div></div><div class="tp-qty">556 units</div></div>
+          <div class="tp-rev">₹36,200</div>
+        </div>
+        <div class="tp-item">
+          <div class="tp-rank tp-r3">#3</div>
+          <div class="tp-info"><div class="tp-name">MCB 32A Single Pole</div><div class="tp-brand">Schneider · Protection</div></div>
+          <div class="tp-bar-wrap"><div class="tp-bar-track"><div class="tp-bar-fill" style="width:71%"></div></div><div class="tp-qty">748 units</div></div>
+          <div class="tp-rev">₹31,400</div>
+        </div>
+        <div class="tp-item">
+          <div class="tp-rank tp-r4">#4</div>
+          <div class="tp-info"><div class="tp-name">Anchor Modular Switch 6A</div><div class="tp-brand">Anchor · Switches</div></div>
+          <div class="tp-bar-wrap"><div class="tp-bar-track"><div class="tp-bar-fill" style="width:58%"></div></div><div class="tp-qty">342 units</div></div>
+          <div class="tp-rev">₹25,600</div>
+        </div>
+        <div class="tp-item">
+          <div class="tp-rank tp-r5">#5</div>
+          <div class="tp-info"><div class="tp-name">Havells BLDC Fan 48"</div><div class="tp-brand">Havells · Fans</div></div>
+          <div class="tp-bar-wrap"><div class="tp-bar-track"><div class="tp-bar-fill" style="width:46%"></div></div><div class="tp-qty">34 units</div></div>
+          <div class="tp-rev">₹20,400</div>
+        </div>
+      </div>
+    </div>
+    <div class="c6" style="display:flex;flex-direction:column;gap:16px">
+      <div class="chart-card" style="flex:1">
+        <div class="cc-title" style="margin-bottom:8px;font-size:14px">Sales by Hour of Day</div>
+        <div class="cc-sub" style="margin-bottom:14px">When do customers buy the most?</div>
+        <div class="chart-wrap" style="height:170px"><canvas id="hourChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="flex:1">
+        <div class="cc-title" style="margin-bottom:8px;font-size:14px">Weekly Revenue Pattern</div>
+        <div class="cc-sub" style="margin-bottom:14px">Best day of the week?</div>
+        <div class="chart-wrap" style="height:140px"><canvas id="weekChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Recent Transactions</div><div class="sec-link">View All →</div></div>
+    <div class="table-card">
+      <div class="tc-head">
+        <div class="tc-title">April 2026 — Transaction Log</div>
+        <div class="tc-actions">
+          <button class="tc-btn tc-btn-sec" onclick="showToast('CSV exported!','var(--green)')">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Date</th><th>Product</th><th>Category</th>
+              <th>Brand</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Payment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="td-id">T-001</td><td>30 Apr</td><td class="td-name">Polycab FR Wire 2.5mm (90m)</td><td><span class="tag tag-wire">Wiring</span></td><td>Polycab</td><td>12</td><td>₹1,850</td><td><strong>₹22,200</strong></td><td><span class="pay-badge pay-cash">Cash</span></td></tr>
+            <tr><td class="td-id">T-002</td><td>30 Apr</td><td class="td-name">LED Panel Light 18W</td><td><span class="tag tag-light">Lighting</span></td><td>Philips</td><td>8</td><td>₹650</td><td><strong>₹5,200</strong></td><td><span class="pay-badge pay-upi">UPI</span></td></tr>
+            <tr><td class="td-id">T-003</td><td>29 Apr</td><td class="td-name">Schneider MCB 32A</td><td><span class="tag tag-protect">Protection</span></td><td>Schneider</td><td>6</td><td>₹420</td><td><strong>₹2,520</strong></td><td><span class="pay-badge pay-cash">Cash</span></td></tr>
+            <tr><td class="td-id">T-004</td><td>29 Apr</td><td class="td-name">Anchor Modular Switch 6A</td><td><span class="tag tag-switch">Switches</span></td><td>Anchor</td><td>50</td><td>₹75</td><td><strong>₹3,750</strong></td><td><span class="pay-badge pay-upi">UPI</span></td></tr>
+            <tr><td class="td-id">T-005</td><td>29 Apr</td><td class="td-name">Havells BLDC Fan 48"</td><td><span class="tag tag-fan">Fans</span></td><td>Havells</td><td>2</td><td>₹6,200</td><td><strong>₹12,400</strong></td><td><span class="pay-badge pay-card">Card</span></td></tr>
+            <tr><td class="td-id">T-006</td><td>28 Apr</td><td class="td-name">Syska Wi-Fi Smart Switch</td><td><span class="tag tag-smart">Smart</span></td><td>Syska</td><td>3</td><td>₹1,450</td><td><strong>₹4,350</strong></td><td><span class="pay-badge pay-upi">UPI</span></td></tr>
+            <tr><td class="td-id">T-007</td><td>28 Apr</td><td class="td-name">L&T RCCB 63A 30mA</td><td><span class="tag tag-protect">Protection</span></td><td>L&T</td><td>4</td><td>₹2,800</td><td><strong>₹11,200</strong></td><td><span class="pay-badge pay-cash">Cash</span></td></tr>
+            <tr><td class="td-id">T-008</td><td>27 Apr</td><td class="td-name">Legrand 3-Pin Socket 16A</td><td><span class="tag tag-switch">Switches</span></td><td>Legrand</td><td>20</td><td>₹320</td><td><strong>₹6,400</strong></td><td><span class="pay-badge pay-upi">UPI</span></td></tr>
+            <tr><td class="td-id">T-009</td><td>27 Apr</td><td class="td-name">Philips Streetlight 50W</td><td><span class="tag tag-light">Lighting</span></td><td>Philips</td><td>5</td><td>₹4,200</td><td><strong>₹21,000</strong></td><td><span class="pay-badge pay-card">Card</span></td></tr>
+            <tr><td class="td-id">T-010</td><td>26 Apr</td><td class="td-name">Polycab FR Wire 1.5mm (90m)</td><td><span class="tag tag-wire">Wiring</span></td><td>Polycab</td><td>18</td><td>₹1,200</td><td><strong>₹21,600</strong></td><td><span class="pay-badge pay-cash">Cash</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pg-row">
+        <span class="pg-info">Showing 1–10 of 1,248 transactions</span>
+        <div class="pg-btns">
+          <button class="pg-btn" disabled>← Prev</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <span style="color:var(--ink4);padding:0 4px">…</span>
+          <button class="pg-btn">125</button>
+          <button class="pg-btn">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page" id="page-stock">
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Inventory Overview</div></div>
+    <div class="kpi-grid">
+      <div class="kpi amber"><div class="kpi-header"><div class="kpi-lbl">Total SKUs</div><div class="kpi-icon">🏪</div></div><div class="kpi-val">4,800</div><div class="kpi-sub"><span class="kpi-note">8 categories</span></div></div>
+      <div class="kpi green"><div class="kpi-header"><div class="kpi-lbl">In Stock</div><div class="kpi-icon">✅</div></div><div class="kpi-val">4,790</div><div class="kpi-sub"><span class="kpi-note">99.8% availability</span><span class="pill up">Healthy</span></div></div>
+      <div class="kpi yellow"><div class="kpi-header"><div class="kpi-lbl">Low Stock</div><div class="kpi-icon">⚠️</div></div><div class="kpi-val">6</div><div class="kpi-sub"><span class="kpi-note">Below reorder point</span><span class="pill warn">Review</span></div></div>
+      <div class="kpi red"><div class="kpi-header"><div class="kpi-lbl">Out of Stock</div><div class="kpi-icon">❌</div></div><div class="kpi-val">2</div><div class="kpi-sub"><span class="kpi-note">Immediate reorder</span><span class="pill dn">Urgent</span></div></div>
+      <div class="kpi blue"><div class="kpi-header"><div class="kpi-lbl">Total Stock Value</div><div class="kpi-icon">💰</div></div><div class="kpi-val">₹8.42L</div><div class="kpi-sub"><span class="kpi-note">At purchase price</span></div></div>
+      <div class="kpi teal"><div class="kpi-header"><div class="kpi-lbl">Last Restocked</div><div class="kpi-icon">📅</div></div><div class="kpi-val" style="font-size:20px">28 Apr</div><div class="kpi-sub"><span class="kpi-note">Polycab wire + MCBs</span></div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Product Inventory Register</div></div>
+    <div class="table-card">
+      <div class="tc-head">
+        <div class="tc-title">All Products — Stock Status</div>
+        <div class="tc-actions">
+          <input type="text" class="tc-search" placeholder="🔍 Search product, brand…" id="stockSearch" oninput="filterStock()">
+          <button class="tc-btn tc-btn-primary" onclick="openModal()">+ Add Product</button>
+          <button class="tc-btn tc-btn-sec" onclick="showToast('Exported!','var(--green)')">⬇ Export</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="stockTbl">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">ID</th>
+              <th onclick="sortTable(1)">Product Name</th>
+              <th onclick="sortTable(2)">Category</th>
+              <th onclick="sortTable(3)">Brand</th>
+              <th onclick="sortTable(4)">Cost ₹</th>
+              <th onclick="sortTable(5)">Sell ₹</th>
+              <th onclick="sortTable(6)">Qty</th>
+              <th onclick="sortTable(7)">Reorder</th>
+              <th onclick="sortTable(8)">Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="stockBody"></tbody>
+        </table>
+      </div>
+      <div class="pg-row">
+        <span class="pg-info" id="stockPgInfo">–</span>
+        <div class="pg-btns">
+          <button class="pg-btn" onclick="changePg(-1)" id="pgPrev">← Prev</button>
+          <button class="pg-btn active" id="pg1btn" onclick="goPage(1)">1</button>
+          <button class="pg-btn" id="pg2btn" onclick="goPage(2)">2</button>
+          <button class="pg-btn" onclick="changePg(1)" id="pgNext">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid12">
+    <div class="chart-card c6">
+      <div class="cc-title" style="margin-bottom:4px">Stock Value by Category</div>
+      <div class="cc-sub" style="margin-bottom:14px">Where is inventory capital concentrated?</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="stockValChart"></canvas></div>
+    </div>
+    <div class="chart-card c6">
+      <div class="cc-title" style="margin-bottom:4px">Stock Turnover Rate (×/month)</div>
+      <div class="cc-sub" style="margin-bottom:14px">How fast does each category sell?</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="turnChart"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page" id="page-alerts">
+
+  <div>
+    <div class="sec-head">
+      <div class="sec-title">Critical Stock Alerts</div>
+      <div class="sec-link">Mark All Read</div>
+    </div>
+    <div class="alerts-grid">
+      <div class="alert-card ac-red">
+        <div class="ac-icon">🚨</div>
+        <div class="ac-type">Out of Stock</div>
+        <div class="ac-title">Havells RCCB 40A 2P — 0 Units</div>
+        <div class="ac-desc">38 units sold this month. Zero remaining. Contractors asking daily — direct revenue loss every day this stays unresolved.</div>
+        <div class="ac-action">Reorder Immediately</div>
+      </div>
+      <div class="alert-card ac-red">
+        <div class="ac-icon">🚨</div>
+        <div class="ac-type">Out of Stock</div>
+        <div class="ac-title">Legrand 6A 2-Pin Socket — 0 Units</div>
+        <div class="ac-desc">High daily demand item. Out of stock since 27 Apr. Multiple walk-in customers turning away. Emergency order required.</div>
+        <div class="ac-action">Place Emergency Order</div>
+      </div>
+      <div class="alert-card ac-yellow">
+        <div class="ac-icon">⚠️</div>
+        <div class="ac-type">Critical Low Stock</div>
+        <div class="ac-title">L&T RCCB 63A 30mA — 7 Units</div>
+        <div class="ac-desc">Selling ~22 units/month. At current pace, only ~10 days of stock remaining. Schedule reorder this week.</div>
+        <div class="ac-action">Schedule Reorder</div>
+      </div>
+      <div class="alert-card ac-yellow">
+        <div class="ac-icon">⚠️</div>
+        <div class="ac-type">Low Stock Warning</div>
+        <div class="ac-title">Syska Wi-Fi Switch 2G — 12 Units</div>
+        <div class="ac-desc">Smart home segment growing. Reorder point is 20 units. Supplier lead time is 5 days — act now.</div>
+        <div class="ac-action">Place Order</div>
+      </div>
+      <div class="alert-card ac-yellow">
+        <div class="ac-icon">⚠️</div>
+        <div class="ac-type">Low Stock Warning</div>
+        <div class="ac-title">Philips Streetlight 50W — 9 Units</div>
+        <div class="ac-desc">Municipal contractor placed repeat enquiry for 15+ units. Current stock insufficient. Proactive reorder advised.</div>
+        <div class="ac-action">Contact Supplier</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Performance Alerts</div></div>
+    <div class="alerts-grid">
+      <div class="alert-card ac-red">
+        <div class="ac-icon">📉</div>
+        <div class="ac-type">Margin Warning</div>
+        <div class="ac-title">Profit Margin Below Target</div>
+        <div class="ac-desc">Current margin 22.2% vs 25% target. Polycab wire discounts for contractor bulk orders are reducing margin. Review pricing policy.</div>
+        <div class="ac-action">Review Pricing</div>
+      </div>
+      <div class="alert-card ac-yellow">
+        <div class="ac-icon">🐢</div>
+        <div class="ac-type">Slow Mover</div>
+        <div class="ac-title">Bajaj Table Fan 400mm — 3 Units/Month</div>
+        <div class="ac-desc">Only 3 units sold this month. 28 units in stock. Tying up ₹22,400 in capital. Consider discounting or bundling.</div>
+        <div class="ac-action">Run Promo Offer</div>
+      </div>
+      <div class="alert-card ac-blue">
+        <div class="ac-icon">📋</div>
+        <div class="ac-type">Bulk Order Pending</div>
+        <div class="ac-title">Contractor Order — Friday Deadline</div>
+        <div class="ac-desc">Ram Electricals: 200 MCBs + 500 Anchor switches + 20 wire coils. Verify stock and prepare invoice before Friday.</div>
+        <div class="ac-action">Prepare Invoice</div>
+      </div>
+      <div class="alert-card ac-amber">
+        <div class="ac-icon">💡</div>
+        <div class="ac-type">Opportunity</div>
+        <div class="ac-title">Smart Systems — Growing Demand</div>
+        <div class="ac-desc">Smart switches and Wi-Fi dimmers showing 3× growth vs last quarter. Consider expanding smart product shelf space.</div>
+        <div class="ac-action">Expand Category</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head"><div class="sec-title">Positive Highlights</div></div>
+    <div class="alerts-grid">
+      <div class="alert-card ac-green">
+        <div class="ac-icon">🏆</div>
+        <div class="ac-type">Top Performer</div>
+        <div class="ac-title">Polycab FR Wire — Best Seller</div>
+        <div class="ac-desc">₹44,200 revenue this month — highest of any SKU. 240 coils sold. Stock healthy at 85 coils.</div>
+        <div class="ac-action">Pre-Order Confirmed</div>
+      </div>
+      <div class="alert-card ac-green">
+        <div class="ac-icon">🎯</div>
+        <div class="ac-type">Revenue Milestone</div>
+        <div class="ac-title">Target: 94.8% Achieved</div>
+        <div class="ac-desc">₹2,84,500 of ₹3,00,000 target reached with 1 day remaining. Best month so far in 2026!</div>
+        <div class="ac-action">Well Done!</div>
+      </div>
+      <div class="alert-card ac-blue">
+        <div class="ac-icon">📦</div>
+        <div class="ac-type">New Arrival</div>
+        <div class="ac-title">500 Polycab Wire Coils Received</div>
+        <div class="ac-desc">Fresh stock received 28 Apr. Shelf updated. Purchase cost and selling price noted. Ready for sale.</div>
+        <div class="ac-action">Stocked & Ready</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  </div><!-- /content -->
+
+  <!-- FOOTER -->
+  <div style="background:#fff;border-top:1px solid var(--border);padding:12px 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--ink4)">
+    <span>Last updated: <strong id="footerTime" style="color:var(--ink2)">—</strong></span>
+    <span>Bhagavathi Amman Electricals · Sathyamangalam, Tamil Nadu · All figures in INR (₹)</span>
+    <span>v2.0.0 · Dashboard Pro</span>
+  </div>
+
+</div><!-- /main-area -->
+</div><!-- /shell -->
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalBg(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">⚡ Add New Product</div>
+    <div class="form-row">
+      <div class="form-group"><label>Product Name *</label><input class="form-input" id="f-name" placeholder="e.g. Polycab FR Wire 4mm"></div>
+      <div class="form-group"><label>Brand *</label><input class="form-input" id="f-brand" placeholder="e.g. Polycab"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Category *</label>
+        <select class="form-select" id="f-cat">
+          <option>Wiring & Cables</option><option>Lighting</option><option>Switches & Sockets</option>
+          <option>Protection (MCB/RCCB)</option><option>Smart Systems</option>
+          <option>Fans & Motors</option><option>Distribution Panels</option><option>Tools & Accessories</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Unit</label><input class="form-input" id="f-unit" placeholder="coil, piece, box…"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Purchase Price (₹) *</label><input class="form-input" id="f-cost" type="number" placeholder="0"></div>
+      <div class="form-group"><label>Selling Price (₹) *</label><input class="form-input" id="f-price" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Current Stock (Qty) *</label><input class="form-input" id="f-qty" type="number" placeholder="0"></div>
+      <div class="form-group"><label>Reorder Point *</label><input class="form-input" id="f-reorder" type="number" placeholder="20"></div>
+    </div>
+    <div class="form-group"><label>Supplier Name</label><input class="form-input" id="f-supplier" placeholder="e.g. Polycab Dealers Coimbatore"></div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">💾 Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+function tick(){
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const pad=n=>String(n).padStart(2,'0');
+  const ts=pad(ist.getHours())+':'+pad(ist.getMinutes())+':'+pad(ist.getSeconds())+' IST';
+  document.getElementById('clockEl').textContent=ts;
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('footerTime').textContent=
+    ist.getDate()+' '+months[ist.getMonth()]+' '+ist.getFullYear()+', '+pad(ist.getHours())+':'+pad(ist.getMinutes())+' IST';
+}
+tick();setInterval(tick,1000);
+
+let sidebarOpen=true;
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);
+}
+
+const pageTitles={dashboard:'Dashboard Overview',sales:'Sales Analysis',stock:'Stock Management',alerts:'Alerts & Exceptions'};
+const pageCrumbs={dashboard:'Overview',sales:'Sales',stock:'Stock',alerts:'Alerts'};
+function switchPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('pageTitle').textContent=pageTitles[id]||id;
+  document.getElementById('pageCrumb').textContent=pageCrumbs[id]||id;
+}
+
+function updatePeriod(){showToast('Period updated!','var(--blue)')}
+
+const stockData=[
+  {id:'SKU-001',name:'Polycab FR Wire 2.5mm (90m)',cat:'Wiring',catCls:'tag-wire',brand:'Polycab',cost:1600,price:1850,qty:85,reorder:20},
+  {id:'SKU-002',name:'LED Panel Light 18W',cat:'Lighting',catCls:'tag-light',brand:'Philips',cost:480,price:650,qty:240,reorder:50},
+  {id:'SKU-003',name:'Schneider MCB 32A Single Pole',cat:'Protection',catCls:'tag-protect',brand:'Schneider',cost:320,price:420,qty:160,reorder:30},
+  {id:'SKU-004',name:'Anchor Modular Switch 6A',cat:'Switches',catCls:'tag-switch',brand:'Anchor',cost:55,price:75,qty:1200,reorder:200},
+  {id:'SKU-005',name:'Havells BLDC Fan 48"',cat:'Fans',catCls:'tag-fan',brand:'Havells',cost:4800,price:6200,qty:28,reorder:10},
+  {id:'SKU-006',name:'Syska Wi-Fi Switch 2-Gang',cat:'Smart',catCls:'tag-smart',brand:'Syska',cost:1100,price:1450,qty:12,reorder:20},
+  {id:'SKU-007',name:'L&T RCCB 63A 30mA 4P',cat:'Protection',catCls:'tag-protect',brand:'L&T',cost:2200,price:2800,qty:7,reorder:15},
+  {id:'SKU-008',name:'Legrand 3-Pin Socket 16A',cat:'Switches',catCls:'tag-switch',brand:'Legrand',cost:240,price:320,qty:420,reorder:100},
+  {id:'SKU-009',name:'Philips Streetlight LED 50W',cat:'Lighting',catCls:'tag-light',brand:'Philips',cost:3200,price:4200,qty:9,reorder:15},
+  {id:'SKU-010',name:'Polycab FR Wire 1.5mm (90m)',cat:'Wiring',catCls:'tag-wire',brand:'Polycab',cost:1050,price:1200,qty:110,reorder:25},
+  {id:'SKU-011',name:'Havells RCCB 40A 2P 30mA',cat:'Protection',catCls:'tag-protect',brand:'Havells',cost:1400,price:1850,qty:0,reorder:20},
+  {id:'SKU-012',name:'Legrand 6A 2-Pin Socket',cat:'Switches',catCls:'tag-switch',brand:'Legrand',cost:120,price:180,qty:0,reorder:50},
+  {id:'SKU-013',name:'Anchor Roma Fan Regulator',cat:'Fans',catCls:'tag-fan',brand:'Anchor',cost:180,price:240,qty:95,reorder:30},
+  {id:'SKU-014',name:'Polycab FR Wire 6mm (90m)',cat:'Wiring',catCls:'tag-wire',brand:'Polycab',cost:2800,price:3400,qty:42,reorder:15},
+  {id:'SKU-015',name:'Schneider Distribution Box 12W',cat:'Panels',catCls:'tag-panel',brand:'Schneider',cost:1800,price:2400,qty:35,reorder:10},
+  {id:'SKU-016',name:'Syska LED Bulb 9W B22',cat:'Lighting',catCls:'tag-light',brand:'Syska',cost:55,price:85,qty:800,reorder:200},
+  {id:'SKU-017',name:'Havells MCB 16A Single Pole',cat:'Protection',catCls:'tag-protect',brand:'Havells',cost:180,price:240,qty:320,reorder:60},
+  {id:'SKU-018',name:'Klein Tools Electrician Set',cat:'Tools',catCls:'tag-tool',brand:'Klein',cost:1200,price:1600,qty:18,reorder:8},
+  {id:'SKU-019',name:'Anchor Piano Switch 10A',cat:'Switches',catCls:'tag-switch',brand:'Anchor',cost:62,price:85,qty:640,reorder:150},
+  {id:'SKU-020',name:'Polycab FR Cable 4mm (90m)',cat:'Wiring',catCls:'tag-wire',brand:'Polycab',cost:2200,price:2650,qty:58,reorder:15},
+  {id:'SKU-021',name:'Bajaj Table Fan 400mm',cat:'Fans',catCls:'tag-fan',brand:'Bajaj',cost:620,price:800,qty:28,reorder:10},
+  {id:'SKU-022',name:'Schneider iCT20A Contactor',cat:'Protection',catCls:'tag-protect',brand:'Schneider',cost:850,price:1100,qty:22,reorder:8},
+  {id:'SKU-023',name:'Philips LED Downlight 7W',cat:'Lighting',catCls:'tag-light',brand:'Philips',cost:180,price:250,qty:380,reorder:80},
+  {id:'SKU-024',name:'Legrand MCB 20A 1P Acti9',cat:'Protection',catCls:'tag-protect',brand:'Legrand',cost:280,price:380,qty:95,reorder:25},
+  {id:'SKU-025',name:'Havells 6-Way DB Box',cat:'Panels',catCls:'tag-panel',brand:'Havells',cost:950,price:1280,qty:45,reorder:12},
+  {id:'SKU-026',name:'Polycab Conduit Pipe 20mm',cat:'Tools',catCls:'tag-tool',brand:'Polycab',cost:38,price:55,qty:1800,reorder:400},
+  {id:'SKU-027',name:'Syska Smart Dimmer Switch',cat:'Smart',catCls:'tag-smart',brand:'Syska',cost:900,price:1200,qty:14,reorder:15},
+  {id:'SKU-028',name:'Anchor 16A 3-Pin Top',cat:'Switches',catCls:'tag-switch',brand:'Anchor',cost:95,price:130,qty:520,reorder:100},
+];
+let filteredStock=[...stockData],stockPage=1;const PER_PAGE=15;
+
+function getStatus(qty,ro){
+  if(qty===0)return{label:'Out of Stock',cls:'s-out',barCls:'sb-crit'};
+  if(qty<=ro*.5)return{label:'Critical',cls:'s-crit',barCls:'sb-crit'};
+  if(qty<=ro)return{label:'Low Stock',cls:'s-low',barCls:'sb-low'};
+  return{label:'In Stock',cls:'s-ok',barCls:'sb-ok'};
+}
+function qtyClass(qty,ro){
+  if(qty===0||qty<=ro)return'qty-crit';
+  if(qty<=ro*2)return'qty-low';
+  return'qty-ok';
+}
+function barW(qty,ro){return qty===0?0:Math.min(100,Math.round(qty/ro/4*100))}
+
+function renderStock(){
+  const tbody=document.getElementById('stockBody');
+  const start=(stockPage-1)*PER_PAGE;
+  const slice=filteredStock.slice(start,start+PER_PAGE);
+  tbody.innerHTML=slice.map(p=>{
+    const st=getStatus(p.qty,p.reorder);
+    const margin=p.cost>0?Math.round((p.price-p.cost)/p.price*100):0;
+    return`<tr>
+      <td class="td-id">${p.id}</td>
+      <td class="td-name">${p.name}</td>
+      <td><span class="tag ${p.catCls}">${p.cat}</span></td>
+      <td style="font-weight:500">${p.brand}</td>
+      <td>₹${p.cost.toLocaleString('en-IN')}</td>
+      <td>₹${p.price.toLocaleString('en-IN')} <span style="font-size:10px;color:var(--green);font-weight:700">(${margin}%)</span></td>
+      <td><span class="${qtyClass(p.qty,p.reorder)}">${p.qty}</span><span class="sbar"><span class="sbar-fill ${st.barCls}" style="width:${barW(p.qty,p.reorder)}%"></span></span></td>
+      <td style="color:var(--ink4)">${p.reorder}</td>
+      <td><span class="stock-badge ${st.cls}">${st.label}</span></td>
+      <td><button class="tc-btn tc-btn-sec" style="padding:4px 10px;font-size:11px" onclick="showToast('Edit: ${p.id} — connect to backend','var(--blue)')">Edit</button></td>
+    </tr>`;
+  }).join('');
+  const tot=filteredStock.length,s=start+1,e=Math.min(start+PER_PAGE,tot);
+  document.getElementById('stockPgInfo').textContent=`Showing ${s}–${e} of ${tot} products`;
+  document.getElementById('pgPrev').disabled=stockPage===1;
+  const maxPg=Math.ceil(tot/PER_PAGE);
+  document.getElementById('pgNext').disabled=stockPage>=maxPg;
+  const b1=document.getElementById('pg1btn'),b2=document.getElementById('pg2btn');
+  b1.className='pg-btn'+(stockPage===1?' active':'');
+  b2.className='pg-btn'+(stockPage===2?' active':'');
+}
+renderStock();
+
+function changePg(d){
+  const max=Math.ceil(filteredStock.length/PER_PAGE);
+  stockPage=Math.max(1,Math.min(max,stockPage+d));
+  renderStock();
+}
+function goPage(n){stockPage=n;renderStock();}
+
+function filterStock(){
+  const q=document.getElementById('stockSearch').value.toLowerCase();
+  filteredStock=stockData.filter(p=>
+    p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||
+    p.cat.toLowerCase().includes(q)||p.id.toLowerCase().includes(q)
+  );
+  stockPage=1;renderStock();
+}
+
+let sortDir=1,lastSortCol=-1;
+function sortTable(col){
+  const ths=document.querySelectorAll('#stockTbl thead th');
+  ths.forEach(th=>th.className='');
+  if(lastSortCol===col){sortDir*=-1;}else{sortDir=1;lastSortCol=col;}
+  ths[col].className=sortDir===1?'sort-asc':'sort-desc';
+  const keys=['id','name','cat','brand','cost','price','qty','reorder'];
+  filteredStock.sort((a,b)=>{
+    const av=a[keys[col]],bv=b[keys[col]];
+    if(typeof av==='number')return(av-bv)*sortDir;
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+  stockPage=1;renderStock();
+}
+
+function openModal(){document.getElementById('modalOverlay').classList.add('open')}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
+function closeModalBg(e){if(e.target===document.getElementById('modalOverlay'))closeModal()}
+function saveProduct(){
+  const name=document.getElementById('f-name').value.trim();
+  const brand=document.getElementById('f-brand').value.trim();
+  const price=parseFloat(document.getElementById('f-price').value)||0;
+  const cost=parseFloat(document.getElementById('f-cost').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||0;
+  const reorder=parseInt(document.getElementById('f-reorder').value)||10;
+  const cat=document.getElementById('f-cat').value;
+  if(!name||!brand||!price){showToast('Please fill all required fields.','var(--red)');return;}
+  const catMap={'Wiring & Cables':'tag-wire','Lighting':'tag-light','Switches & Sockets':'tag-switch',
+    'Protection (MCB/RCCB)':'tag-protect','Smart Systems':'tag-smart',
+    'Fans & Motors':'tag-fan','Distribution Panels':'tag-panel','Tools & Accessories':'tag-tool'};
+  stockData.unshift({id:'SKU-'+String(stockData.length+1).padStart(3,'0'),name,
+    cat:cat.split(' ')[0],catCls:catMap[cat]||'tag-tool',brand,cost,price,qty,reorder});
+  filteredStock=[...stockData];stockPage=1;renderStock();
+  closeModal();showToast('✅ '+name+' added to inventory!','var(--green)');
+  ['f-name','f-brand','f-unit','f-cost','f-price','f-qty','f-reorder','f-supplier'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+}
+let toastTimer;
+function showToast(msg,color='var(--green)'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.style.borderColor=color;t.style.color=color;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+const AMBER='#E07B20',AMBER2='#F59332',BLU='#2563EB',GRN='#16A34A',
+      YEL='#CA8A04',RED='#DC2626',PUR='#7C3AED',TEA='#0D9488',INK='#1A1612',SL='#9A9390';
+const grid='rgba(0,0,0,0.05)',tickC='#9A9390';
+const base={responsive:true,maintainAspectRatio:false};
+const rCtx=document.getElementById('revChart');
+const rGrad=rCtx.getContext('2d').createLinearGradient(0,0,0,200);
+rGrad.addColorStop(0,'rgba(224,123,32,0.2)');rGrad.addColorStop(1,'rgba(224,123,32,0.01)');
+new Chart(rCtx,{type:'line',
+  data:{labels:['Jan','Feb','Mar','Apr'],
+    datasets:[
+      {label:'2026',data:[198000,224000,241000,284500],borderColor:AMBER,borderWidth:2.5,
+        pointBackgroundColor:AMBER,pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:6,tension:.4,fill:true,backgroundColor:rGrad},
+      {label:'2025',data:[172000,188000,205000,240000],borderColor:BLU,borderWidth:2,
+        borderDash:[6,4],pointBackgroundColor:BLU,pointRadius:4,tension:.4,fill:false}
+    ]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+(c.raw/1000).toFixed(0)+'K'}}},
+    scales:{x:{grid:{color:grid},ticks:{color:tickC,font:{size:12,family:'Outfit'}}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:11,family:'Outfit'},callback:v=>'₹'+(v/1000).toFixed(0)+'K'}}}}
+});
+new Chart(document.getElementById('catChart'),{type:'doughnut',
+  data:{labels:['Wiring','Lighting','Switches','Protection','Others'],
+    datasets:[{data:[30,22,18,15,15],backgroundColor:[BLU,YEL,PUR,RED,GRN],
+      borderWidth:4,borderColor:'#fff',hoverBorderColor:'#f8f5f0'}]},
+  options:{...base,cutout:'65%',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}
+});
+new Chart(document.getElementById('unitChart'),{type:'bar',
+  data:{labels:['Wiring','Lighting','Switches','Protect.','Fans','Smart'],
+    datasets:[{data:[2040,1504,1228,820,560,668],
+      backgroundColor:[BLU,YEL,PUR,RED,GRN,TEA],borderRadius:6,borderSkipped:false}]},
+  options:{...base,indexAxis:'y',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString()+' units'}}},
+    scales:{x:{grid:{color:grid},ticks:{color:tickC,font:{size:11,family:'Outfit'}}},
+            y:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:11,family:'Outfit'}}}}}
+});
+const dCtx=document.getElementById('dailyChart');
+const dGrad=dCtx.getContext('2d').createLinearGradient(0,0,0,200);
+dGrad.addColorStop(0,'rgba(37,99,235,0.18)');dGrad.addColorStop(1,'rgba(37,99,235,0.01)');
+const days=Array.from({length:30},(_,i)=>i+1);
+const dVals=[7200,8400,9100,11200,8800,6500,7400,9200,10400,12100,8600,9800,11000,13200,8900,
+             7600,9400,10800,12400,14200,9600,10200,11800,13600,9200,8400,10600,12800,11400,9800];
+new Chart(dCtx,{type:'line',
+  data:{labels:days.map(d=>d+' Apr'),datasets:[{label:'Revenue',data:dVals,borderColor:BLU,borderWidth:2,
+    pointRadius:0,pointHoverRadius:6,pointHoverBackgroundColor:BLU,tension:.4,fill:true,backgroundColor:dGrad}]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.raw.toLocaleString('en-IN')}}},
+    scales:{x:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:10,family:'Outfit'},maxTicksLimit:8}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:11,family:'Outfit'},callback:v=>'₹'+(v/1000).toFixed(0)+'K'}}}}
+});
+new Chart(document.getElementById('brandChart'),{type:'bar',
+  data:{labels:['Polycab','Havells','Anchor','Schneider','L&T','Legrand','Philips','Syska'],
+    datasets:[{data:[86400,64200,48600,42000,38800,32400,28600,18400],
+      backgroundColor:[AMBER,GRN,BLU,RED,YEL,PUR,TEA,INK],borderRadius:6,borderSkipped:false}]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+(c.raw/1000).toFixed(1)+'K'}}},
+    scales:{x:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:10,family:'Outfit'}}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:10,family:'Outfit'},callback:v=>'₹'+(v/1000).toFixed(0)+'K'}}}}
+});
+new Chart(document.getElementById('marginChart'),{type:'line',
+  data:{labels:['Jan','Feb','Mar','Apr'],
+    datasets:[
+      {label:'Margin %',data:[23.8,24.2,23.4,22.2],borderColor:GRN,borderWidth:2.5,
+        pointBackgroundColor:GRN,pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:6,tension:.3,fill:false},
+      {label:'Target',data:[25,25,25,25],borderColor:'rgba(220,38,38,.4)',borderWidth:1.5,
+        borderDash:[6,4],pointRadius:0,fill:false}
+    ]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},
+    scales:{x:{grid:{color:grid},ticks:{color:tickC,font:{size:12,family:'Outfit'}}},
+            y:{grid:{color:grid},min:20,max:28,ticks:{color:tickC,font:{size:11,family:'Outfit'},callback:v=>v+'%'}}}}
+});
+new Chart(document.getElementById('hourChart'),{type:'bar',
+  data:{labels:['8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm'],
+    datasets:[{data:[2400,6800,9200,11400,8600,7200,9800,12400,10600,8800,6200,3200],
+      backgroundColor:Array.from({length:12},(_,i)=>`rgba(224,123,32,${0.35+i*.04})`),
+      borderRadius:5,borderSkipped:false}]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.raw.toLocaleString('en-IN')}}},
+    scales:{x:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:10,family:'Outfit'}}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:9,family:'Outfit'},callback:v=>'₹'+(v/1000).toFixed(0)+'K'}}}}
+});
+new Chart(document.getElementById('weekChart'),{type:'bar',
+  data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets:[{data:[38400,42200,46800,44600,52400,64200,28400],
+      backgroundColor:[BLU,BLU,BLU,BLU,BLU,AMBER,'#D4CCC0'],borderRadius:5,borderSkipped:false}]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.raw.toLocaleString('en-IN')}}},
+    scales:{x:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:11,family:'Outfit'}}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:9,family:'Outfit'},callback:v=>'₹'+(v/1000).toFixed(0)+'K'}}}}
+});
+new Chart(document.getElementById('stockValChart'),{type:'doughnut',
+  data:{labels:['Wiring','Lighting','Switches','Protection','Panels','Fans','Smart','Tools'],
+    datasets:[{data:[280000,145000,98000,172000,84000,68000,42000,38000],
+      backgroundColor:[BLU,YEL,PUR,RED,AMBER,GRN,TEA,INK],borderWidth:4,borderColor:'#fff',hoverBorderColor:'#f8f5f0'}]},
+  options:{...base,cutout:'55%',
+    plugins:{legend:{position:'right',labels:{color:tickC,font:{size:11,family:'Outfit'},padding:10,boxWidth:12,borderRadius:3}},
+             tooltip:{callbacks:{label:c=>'₹'+(c.raw/1000).toFixed(0)+'K — '+c.label}}}}
+});
+new Chart(document.getElementById('turnChart'),{type:'bar',
+  data:{labels:['Switches','Wiring','Lighting','Protection','Smart','Fans','Panels','Tools'],
+    datasets:[{data:[9.1,8.2,6.4,5.8,3.6,2.4,1.8,2.1],
+      backgroundColor:[PUR,BLU,YEL,RED,TEA,GRN,AMBER,INK],borderRadius:6,borderSkipped:false}]},
+  options:{...base,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'× / month'}}},
+    scales:{x:{grid:{color:'transparent'},ticks:{color:tickC,font:{size:10,family:'Outfit'}}},
+            y:{grid:{color:grid},ticks:{color:tickC,font:{size:10,family:'Outfit'},callback:v=>v+'×'}}}}
+});
+</script>
+</body>
+</html>
